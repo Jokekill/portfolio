@@ -1,0 +1,22 @@
+{
+  "name": "portfolio",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "npm run optimize && astro build",
+    "preview": "astro preview",
+    "optimize": "node scripts/optimize.mjs",
+    "add-photo": "node scripts/add-photo.mjs",
+    "demo-photos": "node scripts/generate-demo-photos.mjs"
+  },
+  "dependencies": {
+    "astro": "^4.16.0"
+  },
+  "devDependencies": {
+    "sharp": "^0.33.5",
+    "typescript": "^5.6.0"
+  }
+}

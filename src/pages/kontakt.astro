@@ -1,0 +1,155 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import { site } from '~/data/site';
+---
+
+<BaseLayout title="Kontakt" description={`Kontakt na fotografa ${site.authorName}.`}>
+  <section class="contact">
+    <div class="contact-inner">
+      <span class="eyebrow">Ozvěte se mi</span>
+      <h1>Domluvme focení.</h1>
+      <p class="contact-lead">
+        Píšu zpět obvykle do 24 hodin. Pokud spěcháte, napište do předmětu
+        „naléhavé" — uvidím to dřív.
+      </p>
+
+      <div class="contact-grid">
+        <a href={`mailto:${site.email}?subject=Pop\u00e1vka%20focen\u00ed`} class="contact-card">
+          <span class="contact-card-label">E-mail</span>
+          <span class="contact-card-value">{site.email}</span>
+          <span class="contact-card-cta">Napsat →</span>
+        </a>
+
+        <a href={site.instagramUrl} target="_blank" rel="noopener noreferrer" class="contact-card">
+          <span class="contact-card-label">Instagram</span>
+          <span class="contact-card-value">@{site.instagram}</span>
+          <span class="contact-card-cta">Otevřít profil →</span>
+        </a>
+
+        <div class="contact-card contact-card-static">
+          <span class="contact-card-label">Kde mě najdete</span>
+          <span class="contact-card-value">{site.location}</span>
+          <span class="contact-card-cta">Pohybuju se po celé ČR</span>
+        </div>
+      </div>
+
+      <div class="contact-types">
+        <h3>S čím vám můžu pomoct</h3>
+        <ul>
+          <li>Svatby a obřady</li>
+          <li>Portréty (rodinné, párové, ateliérové)</li>
+          <li>Komerční fotografie a produktové focení</li>
+          <li>Cestovatelské reportáže</li>
+          <li>Tisky a prodej autorských prací</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .contact {
+    padding: 10rem var(--gutter) 6rem;
+  }
+
+  .contact-inner {
+    max-width: var(--container);
+    margin: 0 auto;
+  }
+
+  .contact h1 {
+    margin: 1rem 0 2rem;
+  }
+
+  .contact h1 em {
+    font-style: italic;
+    color: var(--ink-soft);
+  }
+
+  .contact-lead {
+    font-size: 1.125rem;
+    max-width: 36rem;
+    margin-bottom: 4rem;
+  }
+
+  .contact-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 6rem;
+  }
+
+  .contact-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 2rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--line);
+    min-height: 220px;
+    transition: all var(--transition);
+  }
+
+  .contact-card:not(.contact-card-static):hover {
+    border-color: var(--accent);
+    transform: translateY(-3px);
+  }
+
+  .contact-card-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+
+  .contact-card-value {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    font-style: italic;
+    font-weight: 400;
+    line-height: 1.1;
+    color: var(--ink);
+  }
+
+  .contact-card-cta {
+    font-size: 0.875rem;
+    color: var(--ink-soft);
+  }
+
+  .contact-types {
+    padding-top: 4rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .contact-types h3 {
+    margin-bottom: 1.5rem;
+    color: var(--ink-soft);
+    font-size: 0.875rem;
+    font-family: var(--font-body);
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .contact-types ul {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem 2rem;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-style: italic;
+    font-weight: 300;
+  }
+
+  .contact-types li {
+    padding: 0.5rem 0;
+    color: var(--ink);
+    border-bottom: 1px solid var(--line);
+  }
+
+  @media (max-width: 800px) {
+    .contact-grid { grid-template-columns: 1fr; }
+  }
+</style>

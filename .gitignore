@@ -1,0 +1,27 @@
+# Build output
+dist/
+.astro/
+
+# Dependencies
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editory / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Originály fotografií — NIKDY do repa (mohou mít desítky MB)
+# Generované varianty v public/images/generated/ POTŘEBUJEME pro GitHub Pages.
+photos/originals/*
+!photos/originals/.gitkeep
+!photos/originals/README.md
+
+# Lokální tajemství
+.env
+.env.local

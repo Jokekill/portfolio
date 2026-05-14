@@ -1,0 +1,165 @@
+---
+import photosData from '~/data/photos.json';
+import { site } from '~/data/site';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+// Vyber featured fotku s největším poměrem na šířku (pro hero pozadí)
+const featured = photosData
+  .filter((p) => p.featured)
+  .sort((a, b) => b.width / b.height - a.width / a.height)[0] || photosData[0];
+
+const heroSrc = `${base}/images/generated/${featured.src}-2400.jpg`;
+const heroSrcSmall = `${base}/images/generated/${featured.src}-1600.jpg`;
+---
+
+<section class="hero">
+  <div class="hero-bg">
+    <picture>
+      <source
+        type="image/webp"
+        srcset={`${base}/images/generated/${featured.src}-1600.webp 1600w, ${base}/images/generated/${featured.src}-2400.webp 2400w`}
+        sizes="100vw"
+      />
+      <img
+        src={heroSrc}
+        srcset={`${heroSrcSmall} 1600w, ${heroSrc} 2400w`}
+        sizes="100vw"
+        alt={featured.alt}
+        loading="eager"
+        fetchpriority="high"
+      />
+    </picture>
+    <div class="hero-vignette"></div>
+  </div>
+
+  <div class="hero-content">
+    <span class="eyebrow reveal" style="animation-delay: 0.1s">{site.tagline}</span>
+    <h1 class="hero-title reveal" style="animation-delay: 0.25s">
+      <span class="hero-line-1">{site.authorName.split(' ')[0]}</span>
+      <span class="hero-line-2">{site.authorName.split(' ').slice(1).join(' ')}</span>
+    </h1>
+    <p class="hero-intro reveal" style="animation-delay: 0.45s">{site.intro}</p>
+    <div class="hero-cta reveal" style="animation-delay: 0.65s">
+      <a href={`${base}/galerie`} class="btn btn-primary">Prohlédnout galerii</a>
+      <a href={`${base}/kontakt`} class="btn btn-ghost">Domluvit focení</a>
+    </div>
+  </div>
+
+  <div class="hero-scroll-hint reveal" style="animation-delay: 1.2s">
+    <span>Scroll</span>
+    <div class="hero-scroll-line"></div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    min-height: 100svh;
+    display: flex;
+    align-items: flex-end;
+    padding: 0 var(--gutter) 6rem;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .hero-bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transform: scale(1.05);
+    animation: heroZoom 14s var(--ease) forwards;
+  }
+
+  @keyframes heroZoom {
+    to { transform: scale(1); }
+  }
+
+  .hero-vignette {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to top, var(--bg) 0%, transparent 35%, transparent 70%, rgba(13, 12, 10, 0.35) 100%),
+      linear-gradient(to right, rgba(13, 12, 10, 0.4) 0%, transparent 50%);
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: var(--container);
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .hero-title {
+    margin: 1.5rem 0 2rem;
+    font-weight: 300;
+    line-height: 0.95;
+  }
+
+  .hero-line-1,
+  .hero-line-2 {
+    display: block;
+  }
+
+  .hero-line-2 {
+    margin-left: clamp(2rem, 8vw, 6rem);
+    font-style: italic;
+    color: var(--ink-soft);
+  }
+
+  .hero-line-2 em {
+    font-style: italic;
+  }
+
+  .hero-intro {
+    max-width: 32rem;
+    margin-bottom: 2.5rem;
+    color: var(--ink-soft);
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .hero-scroll-hint {
+    position: absolute;
+    bottom: 2rem;
+    right: var(--gutter);
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+
+  .hero-scroll-line {
+    width: 1px;
+    height: 64px;
+    background: linear-gradient(to bottom, var(--ink-mute), transparent);
+    animation: scrollPulse 2.4s ease-in-out infinite;
+  }
+
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+
+  @media (max-width: 720px) {
+    .hero-scroll-hint { display: none; }
+    .hero { padding-bottom: 3rem; }
+  }
+</style>

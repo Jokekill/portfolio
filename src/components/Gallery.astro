@@ -1,0 +1,180 @@
+---
+import PhotoCard from './PhotoCard.astro';
+import { categories } from '~/data/categories';
+import photosData from '~/data/photos.json';
+
+interface Props {
+  /** Limit počtu fotek (pro homepage). Pokud nevyplněno, ukáže všechny. */
+  limit?: number;
+  /** Předfiltrované kategorií */
+  category?: string;
+  /** Zobrazit filtr kategorií */
+  showFilter?: boolean;
+}
+
+const { limit, category, showFilter = true } = Astro.props;
+
+let photos = [...photosData].sort((a, b) => a.order - b.order);
+if (category) photos = photos.filter((p) => p.category === category);
+if (limit) photos = photos.slice(0, limit);
+---
+
+<section class="gallery-section">
+  {showFilter && (
+    <div class="gallery-filter" role="tablist" aria-label="Filtr kategorií">
+      <button class="filter-pill active" data-filter="all" role="tab" aria-selected="true">
+        Vše <span class="count">{photosData.length}</span>
+      </button>
+      {categories.map((cat) => {
+        const n = photosData.filter((p) => p.category === cat.slug).length;
+        if (n === 0) return null;
+        return (
+          <button class="filter-pill" data-filter={cat.slug} role="tab" aria-selected="false">
+            {cat.label} <span class="count">{n}</span>
+          </button>
+        );
+      })}
+    </div>
+  )}
+
+  <div class="gallery-grid" id="galleryGrid">
+    {photos.map((photo, idx) => (
+      <div class="gallery-item" data-category={photo.category}>
+        <PhotoCard photo={photo} index={idx} />
+      </div>
+    ))}
+  </div>
+
+  <div class="gallery-empty" id="galleryEmpty" hidden>
+    <p>V této kategorii zatím nejsou žádné fotografie.</p>
+  </div>
+</section>
+
+<!-- Data pro lightbox v JSON tagu (parsovaná v Lightbox skriptu) -->
+<script
+  type="application/json"
+  id="photoData"
+  set:html={JSON.stringify(photos.map((p) => ({
+    id: p.id,
+    title: p.title,
+    description: p.description,
+    category: p.category,
+    src: p.src,
+    alt: p.alt,
+    width: p.width,
+    height: p.height,
+  })))}
+/>
+
+<style>
+  .gallery-section {
+    padding: 0 var(--gutter);
+    max-width: 1800px;
+    margin: 0 auto;
+  }
+
+  .gallery-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .filter-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.1rem;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--ink-soft);
+    background: transparent;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    transition: all var(--transition);
+    cursor: pointer;
+  }
+
+  .filter-pill:hover {
+    color: var(--ink);
+    border-color: var(--ink-soft);
+  }
+
+  .filter-pill.active {
+    background: var(--ink);
+    color: var(--bg);
+    border-color: var(--ink);
+  }
+
+  .filter-pill .count {
+    font-size: 0.7rem;
+    opacity: 0.6;
+  }
+
+  /* Masonry pomocí CSS columns — funguje bez JS, podporuje různé poměry stran */
+  .gallery-grid {
+    column-count: 3;
+    column-gap: 1.25rem;
+  }
+
+  @media (max-width: 1100px) {
+    .gallery-grid { column-count: 2; }
+  }
+
+  @media (max-width: 640px) {
+    .gallery-grid {
+      column-count: 1;
+      column-gap: 1rem;
+    }
+  }
+
+  .gallery-item {
+    break-inside: avoid;
+    margin-bottom: 1.25rem;
+    animation: fadeUp 0.8s var(--ease) both;
+  }
+
+  .gallery-item.hidden {
+    display: none;
+  }
+
+  .gallery-empty {
+    text-align: center;
+    padding: 6rem 0;
+    color: var(--ink-mute);
+  }
+</style>
+
+<script>
+  // ----------------------------------------------------------------
+  // Filtrování galerie podle kategorie
+  // ----------------------------------------------------------------
+  const pills = document.querySelectorAll<HTMLButtonElement>('.filter-pill');
+  const items = document.querySelectorAll<HTMLElement>('.gallery-item');
+  const empty = document.getElementById('galleryEmpty');
+
+  pills.forEach((pill) => {
+    pill.addEventListener('click', () => {
+      const filter = pill.dataset.filter;
+      pills.forEach((p) => {
+        p.classList.remove('active');
+        p.setAttribute('aria-selected', 'false');
+      });
+      pill.classList.add('active');
+      pill.setAttribute('aria-selected', 'true');
+
+      let visible = 0;
+      items.forEach((item) => {
+        const match = filter === 'all' || item.dataset.category === filter;
+        item.classList.toggle('hidden', !match);
+        if (match) visible++;
+      });
+
+      if (empty) empty.hidden = visible > 0;
+    });
+  });
+</script>

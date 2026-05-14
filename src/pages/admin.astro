@@ -1,0 +1,428 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import photosData from '~/data/photos.json';
+import { categories } from '~/data/categories';
+---
+
+<BaseLayout title="Editor galerie" description="Lokální editor metadat fotografií.">
+  <section class="admin">
+    <div class="admin-inner">
+      <span class="eyebrow">Administrace</span>
+      <h1>Editor <em>galerie</em></h1>
+
+      <div class="admin-notice">
+        <strong>Tento editor pracuje 100 % lokálně ve vašem prohlížeči.</strong>
+        Žádná data nikam neodcházejí, žádné tokeny se neukládají. Po dokončení
+        úprav si stáhnete nový <code>photos.json</code>, který nahradíte
+        v <code>src/data/photos.json</code> a commitnete.
+      </div>
+
+      <div class="admin-toolbar">
+        <button id="loadCurrent" class="btn btn-ghost">Načíst aktuální JSON</button>
+        <label class="btn btn-ghost" style="cursor: pointer;">
+          Otevřít vlastní JSON…
+          <input type="file" id="fileInput" accept=".json,application/json" hidden />
+        </label>
+        <button id="addNew" class="btn btn-ghost">+ Přidat fotku</button>
+        <div class="spacer"></div>
+        <button id="downloadJson" class="btn btn-primary">⬇ Stáhnout photos.json</button>
+      </div>
+
+      <p class="admin-help">
+        <strong>Přesun:</strong> uchop fotku za úchyt vlevo a přetáhni.
+        <strong>Pořadí</strong> se přečísluje automaticky při stažení.
+      </p>
+
+      <ul id="photoList" class="photo-list"></ul>
+
+      <details class="admin-tips">
+        <summary>Co s tímto JSON dál?</summary>
+        <ol>
+          <li>Stáhněte si nový <code>photos.json</code>.</li>
+          <li>Nahraďte jím soubor <code>src/data/photos.json</code> v projektu.</li>
+          <li>Pokud jste přidali nové fotky, dejte originály do <code>photos/originals/</code> se stejným ID v názvu souboru.</li>
+          <li>Spusťte <code>npm run optimize</code>, pak <code>git add . && git commit -m "Aktualizace galerie"</code>.</li>
+          <li>Po pushi se GitHub Actions postará o build a deploy.</li>
+        </ol>
+      </details>
+    </div>
+  </section>
+</BaseLayout>
+
+<script
+  type="application/json"
+  id="initialPhotos"
+  set:html={JSON.stringify(photosData)}
+/>
+
+<script
+  type="application/json"
+  id="categoryList"
+  set:html={JSON.stringify(categories)}
+/>
+
+<script>
+  type Photo = {
+    id: string;
+    title: string;
+    description?: string;
+    category: string;
+    src: string;
+    alt: string;
+    width: number;
+    height: number;
+    date?: string;
+    featured?: boolean;
+    order: number;
+  };
+
+  const initial: Photo[] = JSON.parse(
+    document.getElementById('initialPhotos')?.textContent || '[]'
+  );
+  const cats: { slug: string; label: string }[] = JSON.parse(
+    document.getElementById('categoryList')?.textContent || '[]'
+  );
+
+  let photos: Photo[] = [...initial].sort((a, b) => a.order - b.order);
+
+  const listEl = document.getElementById('photoList') as HTMLUListElement;
+
+  const optionsHtml = (selected: string) =>
+    cats
+      .map(
+        (c) =>
+          `<option value="${c.slug}"${c.slug === selected ? ' selected' : ''}>${c.label}</option>`
+      )
+      .join('');
+
+  const render = () => {
+    listEl.innerHTML = '';
+    photos.forEach((p, i) => {
+      const li = document.createElement('li');
+      li.className = 'photo-row';
+      li.draggable = true;
+      li.dataset.id = p.id;
+      li.innerHTML = `
+        <span class="drag-handle" aria-label="Přesunout">⋮⋮</span>
+        <span class="row-index">${String(i + 1).padStart(3, '0')}</span>
+        <div class="row-fields">
+          <input data-field="title" value="${escapeHtml(p.title)}" placeholder="Název" />
+          <input data-field="alt" value="${escapeHtml(p.alt)}" placeholder="Alt text" />
+          <input data-field="description" value="${escapeHtml(p.description || '')}" placeholder="Popis" />
+          <div class="row-meta">
+            <input data-field="id" value="${escapeHtml(p.id)}" placeholder="ID" />
+            <input data-field="src" value="${escapeHtml(p.src)}" placeholder="Soubor (bez koncovky)" />
+            <select data-field="category">${optionsHtml(p.category)}</select>
+            <label class="featured">
+              <input type="checkbox" data-field="featured" ${p.featured ? 'checked' : ''} />
+              Featured
+            </label>
+          </div>
+        </div>
+        <button class="row-delete" aria-label="Smazat">×</button>
+      `;
+      listEl.appendChild(li);
+    });
+    bindRowEvents();
+  };
+
+  const escapeHtml = (s: string) =>
+    s
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+
+  const bindRowEvents = () => {
+    listEl.querySelectorAll<HTMLLIElement>('.photo-row').forEach((row) => {
+      const id = row.dataset.id!;
+      row.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[data-field]').forEach((el) => {
+        el.addEventListener('input', () => {
+          const photo = photos.find((p) => p.id === id);
+          if (!photo) return;
+          const field = el.dataset.field as keyof Photo;
+          if (el.type === 'checkbox') {
+            (photo as any)[field] = (el as HTMLInputElement).checked;
+          } else {
+            (photo as any)[field] = (el as HTMLInputElement).value;
+          }
+          // Pokud uživatel mění ID, aktualizuj reference
+          if (field === 'id') {
+            row.dataset.id = (el as HTMLInputElement).value;
+          }
+        });
+      });
+      row.querySelector('.row-delete')?.addEventListener('click', () => {
+        if (confirm(`Smazat fotku "${photos.find((p) => p.id === id)?.title}"?`)) {
+          photos = photos.filter((p) => p.id !== id);
+          render();
+        }
+      });
+
+      // Drag & drop
+      row.addEventListener('dragstart', (e) => {
+        (e.dataTransfer as DataTransfer).setData('text/plain', id);
+        row.classList.add('dragging');
+      });
+      row.addEventListener('dragend', () => row.classList.remove('dragging'));
+      row.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        const dragging = document.querySelector('.photo-row.dragging') as HTMLLIElement | null;
+        if (!dragging || dragging === row) return;
+        const rect = row.getBoundingClientRect();
+        const after = e.clientY > rect.top + rect.height / 2;
+        listEl.insertBefore(dragging, after ? row.nextSibling : row);
+      });
+      row.addEventListener('drop', (e) => {
+        e.preventDefault();
+        // Po dropu přepočítej array podle DOMu
+        const newOrder: Photo[] = [];
+        listEl.querySelectorAll<HTMLLIElement>('.photo-row').forEach((r) => {
+          const found = photos.find((p) => p.id === r.dataset.id);
+          if (found) newOrder.push(found);
+        });
+        photos = newOrder;
+        render();
+      });
+    });
+  };
+
+  // Toolbar
+  document.getElementById('loadCurrent')?.addEventListener('click', () => {
+    if (confirm('Načíst aktuální JSON z webu? Přepíše neuložené úpravy.')) {
+      photos = [...initial].sort((a, b) => a.order - b.order);
+      render();
+    }
+  });
+
+  document.getElementById('fileInput')?.addEventListener('change', async (e) => {
+    const input = e.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      if (!Array.isArray(data)) throw new Error('JSON musí být pole.');
+      photos = data.sort((a, b) => a.order - b.order);
+      render();
+    } catch (err) {
+      alert('Chyba načítání souboru: ' + (err as Error).message);
+    }
+    input.value = '';
+  });
+
+  document.getElementById('addNew')?.addEventListener('click', () => {
+    const id = `nova-${Date.now()}`;
+    photos.unshift({
+      id,
+      title: 'Nová fotka',
+      description: '',
+      category: cats[0]?.slug || 'krajina',
+      src: id,
+      alt: '',
+      width: 2400,
+      height: 1600,
+      date: new Date().toISOString().slice(0, 10),
+      featured: false,
+      order: 0,
+    });
+    render();
+  });
+
+  document.getElementById('downloadJson')?.addEventListener('click', () => {
+    // Přepočítej order
+    const out = photos.map((p, i) => ({ ...p, order: i + 1 }));
+    const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'photos.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  render();
+</script>
+
+<style>
+  .admin {
+    padding: 8rem var(--gutter) 6rem;
+  }
+
+  .admin-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .admin h1 {
+    margin: 1rem 0 2rem;
+    font-size: clamp(2.5rem, 6vw, 4rem);
+  }
+
+  .admin h1 em {
+    font-style: italic;
+    color: var(--ink-soft);
+  }
+
+  .admin-notice {
+    background: var(--bg-elevated);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2rem;
+    font-size: 0.9375rem;
+    color: var(--ink-soft);
+  }
+
+  .admin-notice strong { color: var(--ink); display: block; margin-bottom: 0.3rem; }
+  .admin-notice code {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.85em;
+    background: rgba(196, 165, 114, 0.08);
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+  }
+
+  .admin-toolbar {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .admin-toolbar .spacer { flex: 1; }
+
+  .admin-help {
+    margin-bottom: 2rem;
+    font-size: 0.875rem;
+    color: var(--ink-mute);
+  }
+
+  .admin-help strong { color: var(--ink-soft); }
+
+  .photo-list {
+    list-style: none;
+    border-top: 1px solid var(--line);
+  }
+
+  .photo-row {
+    display: grid;
+    grid-template-columns: 24px 48px 1fr 32px;
+    gap: 1rem;
+    align-items: center;
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--line);
+    transition: background var(--transition);
+  }
+
+  .photo-row.dragging {
+    opacity: 0.4;
+    background: var(--bg-elevated);
+  }
+
+  .drag-handle {
+    cursor: grab;
+    color: var(--ink-mute);
+    text-align: center;
+    user-select: none;
+  }
+
+  .drag-handle:active { cursor: grabbing; }
+
+  .row-index {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.8125rem;
+    color: var(--ink-mute);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .row-fields {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .row-fields input,
+  .row-fields select {
+    background: var(--bg-elevated);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    padding: 0.6rem 0.9rem;
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    border-radius: 4px;
+    width: 100%;
+    transition: border var(--transition);
+  }
+
+  .row-fields input:focus,
+  .row-fields select:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .row-meta {
+    display: grid;
+    grid-template-columns: 2fr 2fr 1.5fr auto;
+    gap: 0.5rem;
+  }
+
+  .featured {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8125rem;
+    color: var(--ink-soft);
+    padding: 0 0.5rem;
+  }
+
+  .row-delete {
+    color: var(--ink-mute);
+    font-size: 1.5rem;
+    line-height: 1;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    transition: all var(--transition);
+  }
+
+  .row-delete:hover {
+    color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.08);
+  }
+
+  .admin-tips {
+    margin-top: 4rem;
+    padding: 1.5rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+  }
+
+  .admin-tips summary {
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .admin-tips ol {
+    margin-top: 1rem;
+    padding-left: 1.5rem;
+    color: var(--ink-soft);
+    line-height: 1.8;
+  }
+
+  .admin-tips code {
+    background: rgba(196, 165, 114, 0.08);
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.85em;
+  }
+
+  @media (max-width: 720px) {
+    .photo-row { grid-template-columns: 24px 1fr 32px; }
+    .row-index { display: none; }
+    .row-meta { grid-template-columns: 1fr 1fr; }
+  }
+</style>
