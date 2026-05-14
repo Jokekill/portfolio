@@ -160,6 +160,40 @@ const heroSrcSmall = `${base}/images/generated/${featured.src}-1600.jpg`;
 
   @media (max-width: 720px) {
     .hero-scroll-hint { display: none; }
-    .hero { padding-bottom: 3rem; }
+    .hero {
+      padding-bottom: 3rem;
+      align-items: flex-end;
+    }
+    .hero-title {
+      margin: 1rem 0 1.5rem;
+    }
+    .hero-line-2 {
+      margin-left: 1.5rem;
+    }
+    .hero-intro {
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+    }
+    .hero-cta {
+      gap: 0.75rem;
+      width: 100%;
+    }
+    .hero-cta .btn {
+      flex: 1 1 auto;
+      justify-content: center;
+      padding: 0.85rem 1.1rem;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .hero-cta {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .hero-cta .btn {
+      width: 100%;
+    }
   }
 </style>

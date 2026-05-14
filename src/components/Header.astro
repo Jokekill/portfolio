@@ -22,32 +22,71 @@ const links = [
     {site.authorName}
   </a>
 
-  <button class="menu-toggle" aria-label="Menu" id="menuToggle">
-    <span></span>
-    <span></span>
-  </button>
-
-  <nav class="site-nav" id="siteNav">
+  <nav class="site-nav site-nav-desktop" aria-label="Hlavní menu">
     {links.map((link) => (
       <a href={`${base}${link.href}`} class={isActive(link.href) ? 'active' : ''}>
         {link.label}
       </a>
     ))}
   </nav>
+
+  <button
+    class="menu-toggle"
+    aria-label="Otevřít menu"
+    aria-controls="mobileNav"
+    aria-expanded="false"
+    id="menuToggle"
+    type="button"
+  >
+    <span></span>
+    <span></span>
+  </button>
 </header>
+
+<nav
+  class="site-nav site-nav-mobile"
+  id="mobileNav"
+  aria-label="Mobilní menu"
+  aria-hidden="true"
+>
+  {links.map((link) => (
+    <a href={`${base}${link.href}`} class={isActive(link.href) ? 'active' : ''}>
+      {link.label}
+    </a>
+  ))}
+</nav>
 
 <script>
   const toggle = document.getElementById('menuToggle');
-  const nav = document.getElementById('siteNav');
+  const nav = document.getElementById('mobileNav');
+  const body = document.body;
+
+  const setOpen = (open: boolean) => {
+    if (!toggle || !nav) return;
+    toggle.classList.toggle('open', open);
+    nav.classList.toggle('open', open);
+    body.classList.toggle('nav-open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+    nav.setAttribute('aria-hidden', String(!open));
+    toggle.setAttribute('aria-label', open ? 'Zavřít menu' : 'Otevřít menu');
+  };
+
   toggle?.addEventListener('click', () => {
-    toggle.classList.toggle('open');
-    nav?.classList.toggle('open');
+    const isOpen = toggle.classList.contains('open');
+    setOpen(!isOpen);
   });
-  // Zavři menu po kliknutí na link
+
   nav?.querySelectorAll('a').forEach((a) =>
-    a.addEventListener('click', () => {
-      toggle?.classList.remove('open');
-      nav.classList.remove('open');
-    })
+    a.addEventListener('click', () => setOpen(false))
   );
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && toggle?.classList.contains('open')) setOpen(false);
+  });
+
+  // Po resize nad mobilní breakpoint menu vždy zavři, aby se nezaseklo
+  const mq = window.matchMedia('(min-width: 721px)');
+  mq.addEventListener?.('change', (e) => {
+    if (e.matches) setOpen(false);
+  });
 </script>
