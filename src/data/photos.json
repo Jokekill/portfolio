@@ -154,5 +154,18 @@
     "date": "2024-10-19",
     "featured": false,
     "order": 12
+  },
+  {
+    "id": "chleba-001",
+    "title": "Naříznutí chlebu",
+    "description": "Nažíznout a šup s ním do pece",
+    "category": "udalosti",
+    "src": "chleba-001",
+    "alt": "",
+    "width": 4000,
+    "height": 6000,
+    "date": "2026-04-25",
+    "featured": false,
+    "order": 13
   }
 ]
