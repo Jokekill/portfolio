@@ -120,9 +120,10 @@ const gen = `${base}/images/generated`;
     display: block;
   }
 
-  /* Na dotykových zařízeních — meta vždy vidět tlumeně */
-  @media (hover: none) {
-    .photo-card::before { opacity: 0.7; }
-    .photo-card-meta { transform: none; opacity: 1; }
+  /* Na dotykových zařízeních / mobilu — meta i gradient skryté.
+     Název a popis se objeví až v lightboxu po rozkliknutí. */
+  @media (hover: none), (max-width: 720px) {
+    .photo-card::before { opacity: 0; }
+    .photo-card-meta { display: none; }
   }
 </style>
