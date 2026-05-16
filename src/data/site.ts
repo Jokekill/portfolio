@@ -3,7 +3,7 @@ export const site = {
   authorName: 'Vojta Mykiska',
   tagline: 'Mé Fotografické portfolio',
   intro:
-    'Hledám světlo, ticho a okamžiky, které stojí za to zvětšnit.',
+    'Jsem nadšený fotograf z České republiky, který se věnuje zachycování krásy světa kolem nás. Zde najdete ukázku mých publikovatelných snímků, které vznikly během mých cest a dobrodružství.',
   location: 'Česká republika',
   email: 'Vojta.Mykiska@gmail.com',
   instagram: 'vojta_mykiska',
