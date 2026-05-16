@@ -6,8 +6,8 @@ export const site = {
     'Hledám světlo, ticho a okamžiky, které stojí za to zvětšnit.',
   location: 'Česká republika',
   email: 'Vojta.Mykiska@gmail.com',
-  instagram: 'tvuj_instagram',
-  instagramUrl: 'https://instagram.com/tvuj_instagram',
+  instagram: 'vojta_mykiska',
+  instagramUrl: 'https://www.instagram.com/vojta_mykiska/',
   // URL pro Open Graph / sociální náhledy
   ogImage: '/images/og-cover.jpg',
 };
