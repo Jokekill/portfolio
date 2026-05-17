@@ -5,8 +5,7 @@ import { defineConfig } from 'astro/config';
 //   - `base`: prázdné pro user/organization site (username.github.io),
 //             nebo "/nazev-repa" pro project site (username.github.io/nazev-repa)
 export default defineConfig({
-  site: 'https://username.github.io',
-  base: '/portfolio',
+  site: 'https://vojtamykiska.cz',
   trailingSlash: 'ignore',
   build: {
     assets: 'assets',
