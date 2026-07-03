@@ -4,17 +4,24 @@ import Hero from '~/components/Hero.astro';
 import Gallery from '~/components/Gallery.astro';
 import Lightbox from '~/components/Lightbox.astro';
 import { site } from '~/data/site';
+import { categories } from '~/data/categories';
+import photosData from '~/data/photos.json';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+// Kategorie, které mají alespoň jednu fotku (pro marquee a statistiky)
+const activeCategories = categories.filter((c) =>
+  photosData.some((p) => p.category === c.slug)
+);
 ---
 
 <BaseLayout>
   <Hero />
 
   <section class="featured-section">
-    <header class="section-header">
+    <header class="section-header" data-reveal>
       <span class="eyebrow">Výběr</span>
-      <h2>Nejnovější práce</h2>
+      <h2>Nejnovější <em>práce</em></h2>
       <p>
         Krátký výběr z poslední doby. Kompletní portfolio najdete v
         <a href={`${base}/galerie`} class="link-underline">galerii</a>.
@@ -23,18 +30,48 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
     <Gallery limit={6} showFilter={false} />
 
-    <div class="featured-cta">
+    <div class="featured-cta" data-reveal>
       <a href={`${base}/galerie`} class="btn btn-ghost">Celá galerie →</a>
     </div>
   </section>
 
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      {[0, 1].map(() => (
+        <div class="marquee-seq">
+          {activeCategories.map((cat) => (
+            <>
+              <span class="marquee-item">{cat.label}</span>
+              <span class="marquee-sep">✳</span>
+            </>
+          ))}
+        </div>
+      ))}
+    </div>
+  </div>
+
   <section class="intro-section">
-    <div class="intro-grid">
-      <div>
+    <div class="intro-inner">
+      <div data-reveal>
         <span class="eyebrow">{site.location}</span>
-        <h2 style="margin: 1rem 0 1.5rem;">{site.intro}</h2>
+        <h2 class="intro-statement">{site.intro}</h2>
         <a href={`${base}/o-mne`} class="link-underline">Více o mně →</a>
       </div>
+
+      <dl class="intro-stats" data-reveal style="--reveal-delay: 150ms">
+        <div>
+          <dt class="stat-num">{photosData.length}</dt>
+          <dd class="stat-label">fotografií</dd>
+        </div>
+        <div>
+          <dt class="stat-num">{activeCategories.length}</dt>
+          <dd class="stat-label">kategorií</dd>
+        </div>
+        <div>
+          <dt class="stat-num">∞</dt>
+          <dd class="stat-label">radosti z focení</dd>
+        </div>
+      </dl>
     </div>
   </section>
 
@@ -43,22 +80,17 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 <style>
   .featured-section {
-    padding: 8rem 0 4rem;
+    padding: 6rem 0 3rem;
   }
 
   .section-header {
     max-width: var(--container);
-    margin: 0 auto 4rem;
+    margin: 0 auto 3rem;
     padding: 0 var(--gutter);
   }
 
   .section-header h2 {
     margin: 1rem 0 1rem;
-  }
-
-  .section-header h2 em {
-    font-style: italic;
-    color: var(--ink-soft);
   }
 
   .section-header p {
@@ -67,28 +99,108 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
   .featured-cta {
     text-align: center;
-    padding: 4rem var(--gutter) 0;
+    padding: 3rem var(--gutter) 0;
   }
 
-  .intro-section {
-    padding: 8rem var(--gutter);
+  /* Nekonečný pás kategorií */
+  .marquee {
+    overflow: hidden;
+    margin-top: 5rem;
+    padding: 1.1rem 0;
     border-top: 1px solid var(--line);
-    margin-top: 6rem;
+    border-bottom: 1px solid var(--line);
   }
 
-  .intro-grid {
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee 30s linear infinite;
+  }
+
+  .marquee-seq {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    padding-right: 2rem;
+    white-space: nowrap;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(1.5rem, 4vw, 2.25rem);
+    color: var(--ink-mute);
+  }
+
+  .marquee-sep {
+    font-size: 0.9em;
+    color: var(--accent);
+    opacity: 0.55;
+  }
+
+  @keyframes marquee {
+    to { transform: translateX(-50%); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track { animation: none; }
+  }
+
+  /* Editorial statement + statistiky */
+  .intro-section {
+    padding: 6rem var(--gutter) 2rem;
+  }
+
+  .intro-inner {
     max-width: var(--container);
     margin: 0 auto;
+  }
+
+  .intro-statement {
+    max-width: 22ch;
+    margin: 1.25rem 0 1.75rem;
+    font-size: clamp(1.625rem, 4.5vw, 3rem);
+    line-height: 1.15;
+  }
+
+  .intro-stats {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4rem;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    margin-top: 4rem;
+    padding-top: 3rem;
+    border-top: 1px solid var(--line);
   }
 
-  .intro-grid > div {
-    max-width: 36rem;
+  .stat-num {
+    font-family: var(--font-display);
+    font-size: clamp(2.75rem, 6vw, 4rem);
+    line-height: 1;
+    color: var(--ink);
   }
 
-  @media (max-width: 800px) {
-    .intro-grid { grid-template-columns: 1fr; }
+  .stat-label {
+    margin-top: 0.5rem;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+
+  @media (min-width: 641px) {
+    .featured-section {
+      padding-top: 8rem;
+    }
+
+    .section-header {
+      margin-bottom: 4rem;
+    }
+
+    .intro-section {
+      padding-top: 8rem;
+    }
+
+    .intro-stats {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3rem;
+    }
   }
 </style>

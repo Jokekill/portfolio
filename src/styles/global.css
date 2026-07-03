@@ -1,22 +1,24 @@
 /* ============================================================
    Globální styly — warm dark editorial
+   Mobile-first: základ je mobil, min-width media queries
+   rozšiřují pro větší obrazovky.
    ============================================================ */
 
 :root {
   /* Barvy — teplé tmavé, aby vynikly fotky */
-  --bg: #0d0c0a;
-  --bg-elevated: #15130f;
-  --bg-overlay: rgba(13, 12, 10, 0.92);
-  --ink: #ebe6dc;
-  --ink-soft: #a8a193;
-  --ink-mute: #6b665b;
-  --line: rgba(235, 230, 220, 0.12);
-  --line-strong: rgba(235, 230, 220, 0.28);
-  --accent: #c4a572;
+  --bg: #0a0908;
+  --bg-elevated: #141210;
+  --bg-overlay: rgba(10, 9, 8, 0.94);
+  --ink: #ece7dd;
+  --ink-soft: #a49d8f;
+  --ink-mute: #6f6a5f;
+  --line: rgba(236, 231, 221, 0.1);
+  --line-strong: rgba(236, 231, 221, 0.26);
+  --accent: #c9a878;
 
   /* Typografie */
-  --font-display: 'Fraunces', 'Cormorant Garamond', Georgia, serif;
-  --font-body: 'Inter Tight', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Instrument Serif', 'Times New Roman', Georgia, serif;
+  --font-body: 'Instrument Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 
   /* Spacing & motion */
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
@@ -43,8 +45,7 @@ body {
   color: var(--ink);
   font-family: var(--font-body);
   font-size: 16px;
-  line-height: 1.6;
-  font-feature-settings: 'ss01', 'cv11';
+  line-height: 1.65;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
@@ -56,26 +57,79 @@ body {
   color: var(--bg);
 }
 
-/* Typografie */
+/* Přístupný focus — jen z klávesnice */
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Skip link pro čtečky a klávesnici */
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 3000;
+  padding: 0.75rem 1.25rem;
+  background: var(--ink);
+  color: var(--bg);
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 999px;
+  transform: translateY(-200%);
+  transition: transform 200ms ease;
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+/* ============================================================
+   Filmové zrno — jemná textura přes celý web
+   ============================================================ */
+
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  pointer-events: none;
+  opacity: 0.055;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 240px 240px;
+}
+
+/* ============================================================
+   Typografie
+   ============================================================ */
+
 h1, h2, h3, h4 {
   font-family: var(--font-display);
-  font-weight: 300;
-  letter-spacing: -0.02em;
-  line-height: 1.05;
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  line-height: 1.02;
   color: var(--ink);
-  font-variation-settings: 'opsz' 144, 'SOFT' 50;
+}
+
+h1 em, h2 em, h3 em {
+  font-style: italic;
+  color: var(--ink-soft);
 }
 
 h1 {
-  font-size: clamp(2.5rem, 8vw, 6.5rem);
+  font-size: clamp(2.75rem, 11vw, 7rem);
 }
 
 h2 {
-  font-size: clamp(2rem, 5vw, 4rem);
+  font-size: clamp(2.125rem, 6vw, 4.25rem);
 }
 
 h3 {
-  font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+  font-size: clamp(1.375rem, 2.5vw, 1.75rem);
 }
 
 p {
@@ -123,9 +177,9 @@ button {
 /* Editorial eyebrow */
 .eyebrow {
   font-family: var(--font-body);
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 500;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
   color: var(--ink-mute);
 }
@@ -137,9 +191,9 @@ button {
   gap: 0.6rem;
   padding: 0.95rem 1.6rem;
   font-family: var(--font-body);
-  font-size: 0.9rem;
+  font-size: 0.8125rem;
   font-weight: 500;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   border-radius: 999px;
   transition: all var(--transition);
@@ -163,7 +217,7 @@ button {
 
 .btn-ghost:hover {
   border-color: var(--ink);
-  background: rgba(235, 230, 220, 0.04);
+  background: rgba(236, 231, 221, 0.04);
 }
 
 /* Subtle text link */
@@ -204,12 +258,63 @@ button {
   to { opacity: 1; }
 }
 
+/* Animace při načtení (hero — nad ohybem) */
 .reveal {
   animation: fadeUp 1s var(--ease) both;
 }
 
+/* Reveal při scrollu — řízeno IntersectionObserverem v BaseLayout.
+   Skryté jen pokud běží JS (html.js), jinak vše viditelné. */
+html.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.9s var(--ease),
+    transform 0.9s var(--ease);
+  transition-delay: var(--reveal-delay, 0s);
+}
+
+html.js [data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
 /* ============================================================
-   Header
+   Kurzorová pilulka „Otevřít" nad fotkami (jen desktop/myš)
+   ============================================================ */
+
+.cursor-pill {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 500;
+  padding: 0.55rem 1.05rem;
+  background: var(--ink);
+  color: var(--bg);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -50%);
+  scale: 0.6;
+  transition:
+    transform 340ms var(--ease),
+    scale 340ms var(--ease),
+    opacity 220ms ease;
+  will-change: transform;
+}
+
+.cursor-pill.active {
+  opacity: 1;
+  scale: 1;
+}
+
+/* ============================================================
+   Header — mobile-first
    ============================================================ */
 
 .site-header {
@@ -217,18 +322,20 @@ button {
   top: 0;
   left: 0;
   right: 0;
-  z-index: 100;
+  /* Nad mobilním drawerem (105), aby logo a zavírací tlačítko
+     zůstaly viditelné i při otevřeném menu */
+  z-index: 110;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
   padding: 1.25rem var(--gutter);
-  background: linear-gradient(to bottom, rgba(13, 12, 10, 0.7), rgba(13, 12, 10, 0.0));
+  background: linear-gradient(to bottom, rgba(10, 9, 8, 0.7), rgba(10, 9, 8, 0));
   transition: background var(--transition), border-color var(--transition);
 }
 
 .site-header.scrolled {
-  background: rgba(13, 12, 10, 0.85);
+  background: rgba(10, 9, 8, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--line);
@@ -236,16 +343,17 @@ button {
 
 .site-logo {
   font-family: var(--font-display);
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   font-weight: 400;
   letter-spacing: -0.01em;
   font-style: italic;
   white-space: nowrap;
 }
 
+/* Desktop nav — na mobilu skrytý */
 .site-nav-desktop {
-  display: flex;
-  gap: 2rem;
+  display: none;
+  gap: 2.25rem;
   align-items: center;
 }
 
@@ -273,9 +381,9 @@ button {
   transform: translateX(-50%);
 }
 
-/* Hamburger button */
+/* Hamburger button — výchozí (mobil) */
 .menu-toggle {
-  display: none;
+  display: block;
   width: 44px;
   height: 44px;
   position: relative;
@@ -305,104 +413,207 @@ button {
   transform: rotate(-45deg);
 }
 
-/* Mobile menu drawer (sibling of header, not child — robust positioning) */
+/* Mobilní menu — fullscreen drawer */
 .site-nav-mobile {
-  display: none;
+  display: flex;
+  position: fixed;
+  inset: 0;
+  z-index: 105;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 1.75rem;
+  padding: 5rem var(--gutter) 3rem;
+  background: var(--bg);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-12px);
+  transition:
+    opacity var(--transition),
+    transform var(--transition),
+    visibility 0s linear var(--transition);
 }
 
-@media (max-width: 720px) {
-  .site-nav-desktop { display: none; }
-  .menu-toggle { display: block; }
+.site-nav-mobile.open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+  transition:
+    opacity var(--transition),
+    transform var(--transition),
+    visibility 0s linear 0s;
+}
 
-  .site-nav-mobile {
-    display: flex;
-    position: fixed;
-    inset: 0;
-    z-index: 105;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 2rem;
-    padding: 5rem var(--gutter) 3rem;
-    background: var(--bg);
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transform: translateY(-12px);
-    transition:
-      opacity var(--transition),
-      transform var(--transition),
-      visibility 0s linear var(--transition);
-  }
+.site-nav-mobile a {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 10vw, 3.25rem);
+  font-weight: 400;
+  color: var(--ink);
+  line-height: 1.1;
+}
 
-  .site-nav-mobile.open {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-    transform: translateY(0);
-    transition:
-      opacity var(--transition),
-      transform var(--transition),
-      visibility 0s linear 0s;
-  }
+.site-nav-mobile a .nav-num {
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  color: var(--ink-mute);
+}
 
-  .site-nav-mobile a {
-    font-family: var(--font-display);
-    font-size: clamp(2rem, 9vw, 2.75rem);
-    font-weight: 300;
-    color: var(--ink);
-    line-height: 1.15;
-  }
+.site-nav-mobile a.active {
+  color: var(--accent);
+  font-style: italic;
+}
 
-  .site-nav-mobile a.active {
-    color: var(--accent);
-  }
+/* Lock body scroll while menu is open */
+body.nav-open {
+  overflow: hidden;
+}
 
-  /* Lock body scroll while menu is open */
-  body.nav-open {
-    overflow: hidden;
-  }
+@media (min-width: 721px) {
+  .site-nav-desktop { display: flex; }
+  .menu-toggle { display: none; }
+  .site-nav-mobile { display: none; }
 }
 
 /* ============================================================
-   Footer
+   Footer — velké editorial CTA
    ============================================================ */
 
 .site-footer {
-  margin-top: 8rem;
-  padding: 4rem var(--gutter) 2rem;
+  margin-top: 7rem;
   border-top: 1px solid var(--line);
-  font-size: 0.875rem;
   color: var(--ink-mute);
 }
 
 .site-footer-inner {
   max-width: var(--container);
   margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: end;
-  flex-wrap: wrap;
-  gap: 2rem;
+  padding: 4.5rem var(--gutter) 2rem;
 }
 
-.site-footer h4 {
+.footer-cta {
+  padding-bottom: 3.5rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.footer-cta-link {
+  display: inline-block;
+  margin-top: 1.25rem;
   font-family: var(--font-display);
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
+  font-size: clamp(2.5rem, 9vw, 5.5rem);
+  line-height: 1;
+  letter-spacing: -0.015em;
   color: var(--ink);
+  transition: color var(--transition);
+}
+
+.footer-cta-link em {
+  font-style: italic;
+  color: var(--ink-soft);
+  transition: color var(--transition);
+}
+
+.footer-cta-link .arrow {
+  display: inline-block;
+  margin-left: 0.35em;
+  transition: transform var(--transition);
+}
+
+.footer-cta-link:hover,
+.footer-cta-link:hover em {
+  color: var(--accent);
+}
+
+.footer-cta-link:hover .arrow {
+  transform: translateX(0.25em);
+}
+
+.footer-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 3rem 0;
+  font-size: 0.875rem;
+}
+
+.footer-name {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-style: italic;
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: 0.35rem;
 }
 
 .footer-links {
   display: flex;
-  gap: 2rem;
+  gap: 1.75rem;
   flex-wrap: wrap;
 }
 
-/* Reduced motion */
+.footer-links a {
+  color: var(--ink-soft);
+}
+
+.footer-links a:hover {
+  color: var(--ink);
+}
+
+.footer-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.8125rem;
+}
+
+.footer-meta a:hover {
+  color: var(--ink);
+}
+
+@media (min-width: 721px) {
+  .footer-grid {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+}
+
+/* ============================================================
+   View transitions — rychlý, jemný fade mezi stránkami
+   ============================================================ */
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.3s;
+  animation-timing-function: ease;
+}
+
+/* ============================================================
+   Reduced motion
+   ============================================================ */
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  html.js [data-reveal] {
+    opacity: 1;
+    transform: none;
   }
 }

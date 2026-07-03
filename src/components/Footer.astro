@@ -9,18 +9,33 @@ const { noMargin = false } = Astro.props;
 
 <footer class="site-footer" style={noMargin ? 'margin-top: 0' : ''}>
   <div class="site-footer-inner">
-    <div>
-      <h4>{site.authorName}</h4>
-      <p style="color: var(--ink-mute); margin-top: 0.25rem;">{site.location}</p>
+    <div class="footer-cta" data-reveal>
+      <span class="eyebrow">Máte nápad na focení?</span>
+      <br />
+      <a href={`${base}/kontakt`} class="footer-cta-link">
+        Pojďme <em>tvořit</em><span class="arrow">→</span>
+      </a>
     </div>
-    <div class="footer-links">
-      <a href={`${base}/galerie`} class="link-underline">Galerie</a>
-      <a href={`${base}/o-mne`} class="link-underline">O mně</a>
-      <a href={`${base}/kontakt`} class="link-underline">Kontakt</a>
+
+    <div class="footer-grid">
+      <div>
+        <p class="footer-name">{site.authorName}</p>
+        <p style="color: var(--ink-mute); font-size: 0.875rem;">{site.location}</p>
+      </div>
+      <nav class="footer-links" aria-label="Odkazy v patičce">
+        <a href={`${base}/galerie`} class="link-underline">Galerie</a>
+        <a href={`${base}/o-mne`} class="link-underline">O mně</a>
+        <a href={`${base}/kontakt`} class="link-underline">Kontakt</a>
+        <a href={site.instagramUrl} target="_blank" rel="noopener noreferrer" class="link-underline">
+          Instagram ↗
+        </a>
+      </nav>
     </div>
-  </div>
-  <div style="max-width: var(--container); margin: 3rem auto 0; padding-top: 1.5rem; border-top: 1px solid var(--line); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; font-size: 0.8125rem;">
-    <span>© {year} {site.authorName}. Všechna práva vyhrazena.</span>
-    <span>Postaveno s Astro a péčí.</span>
+
+    <div class="footer-meta">
+      <span>© {year} {site.authorName}. Všechna práva vyhrazena.</span>
+      <span>Postaveno s Astro a péčí.</span>
+      <a href="#top" aria-label="Zpět nahoru">Nahoru ↑</a>
+    </div>
   </div>
 </footer>

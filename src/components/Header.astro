@@ -49,39 +49,43 @@ const links = [
   aria-label="Mobilní menu"
   aria-hidden="true"
 >
-  {links.map((link) => (
+  {links.map((link, i) => (
     <a href={`${base}${link.href}`} class={isActive(link.href) ? 'active' : ''}>
+      <span class="nav-num">0{i + 1}</span>
       {link.label}
     </a>
   ))}
 </nav>
 
 <script>
-  const toggle = document.getElementById('menuToggle');
-  const nav = document.getElementById('mobileNav');
-  const body = document.body;
-
+  // Delegované listenery na document — přežijí view-transition
+  // výměnu DOM a modul se váže jen jednou za session.
   const setOpen = (open: boolean) => {
+    const toggle = document.getElementById('menuToggle');
+    const nav = document.getElementById('mobileNav');
     if (!toggle || !nav) return;
     toggle.classList.toggle('open', open);
     nav.classList.toggle('open', open);
-    body.classList.toggle('nav-open', open);
+    document.body.classList.toggle('nav-open', open);
     toggle.setAttribute('aria-expanded', String(open));
     nav.setAttribute('aria-hidden', String(!open));
     toggle.setAttribute('aria-label', open ? 'Zavřít menu' : 'Otevřít menu');
   };
 
-  toggle?.addEventListener('click', () => {
-    const isOpen = toggle.classList.contains('open');
-    setOpen(!isOpen);
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    const toggle = target.closest('#menuToggle');
+    if (toggle) {
+      setOpen(!toggle.classList.contains('open'));
+      return;
+    }
+    if (target.closest('#mobileNav a')) setOpen(false);
   });
 
-  nav?.querySelectorAll('a').forEach((a) =>
-    a.addEventListener('click', () => setOpen(false))
-  );
-
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && toggle?.classList.contains('open')) setOpen(false);
+    if (e.key === 'Escape' && document.getElementById('menuToggle')?.classList.contains('open')) {
+      setOpen(false);
+    }
   });
 
   // Po resize nad mobilní breakpoint menu vždy zavři, aby se nezaseklo
@@ -89,4 +93,7 @@ const links = [
   mq.addEventListener?.('change', (e) => {
     if (e.matches) setOpen(false);
   });
+
+  // Po navigaci mezi stránkami začni se zavřeným menu
+  document.addEventListener('astro:after-swap', () => setOpen(false));
 </script>

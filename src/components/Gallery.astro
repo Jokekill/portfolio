@@ -39,7 +39,12 @@ if (limit) photos = photos.slice(0, limit);
 
   <div class="gallery-grid" id="galleryGrid">
     {photos.map((photo, idx) => (
-      <div class="gallery-item" data-category={photo.category}>
+      <div
+        class="gallery-item"
+        data-category={photo.category}
+        data-reveal
+        style={`--reveal-delay: ${(idx % 3) * 90}ms`}
+      >
         <PhotoCard photo={photo} index={idx} />
       </div>
     ))}
@@ -115,27 +120,31 @@ if (limit) photos = photos.slice(0, limit);
     opacity: 0.6;
   }
 
-  /* Masonry pomocí CSS columns — funguje bez JS, podporuje různé poměry stran */
+  /* Masonry pomocí CSS columns — mobile-first: 1 sloupec,
+     na tabletu 2, na desktopu 3 */
   .gallery-grid {
-    column-count: 3;
-    column-gap: 1.25rem;
+    column-count: 1;
+    column-gap: 1rem;
   }
 
-  @media (max-width: 1100px) {
-    .gallery-grid { column-count: 2; }
-  }
-
-  @media (max-width: 640px) {
+  @media (min-width: 641px) {
     .gallery-grid {
-      column-count: 1;
-      column-gap: 1rem;
+      column-count: 2;
+      column-gap: 1.25rem;
     }
+  }
+
+  @media (min-width: 1101px) {
+    .gallery-grid { column-count: 3; }
   }
 
   .gallery-item {
     break-inside: avoid;
-    margin-bottom: 1.25rem;
-    animation: fadeUp 0.8s var(--ease) both;
+    margin-bottom: 1rem;
+  }
+
+  @media (min-width: 641px) {
+    .gallery-item { margin-bottom: 1.25rem; }
   }
 
   .gallery-item.hidden {
@@ -151,30 +160,63 @@ if (limit) photos = photos.slice(0, limit);
 
 <script>
   // ----------------------------------------------------------------
-  // Filtrování galerie podle kategorie
+  // Filtrování galerie — delegovaně na document, přežije
+  // view-transition navigaci bez opětovného bindování
   // ----------------------------------------------------------------
-  const pills = document.querySelectorAll<HTMLButtonElement>('.filter-pill');
-  const items = document.querySelectorAll<HTMLElement>('.gallery-item');
-  const empty = document.getElementById('galleryEmpty');
+  document.addEventListener('click', (e) => {
+    const pill = (e.target as HTMLElement).closest<HTMLButtonElement>('.filter-pill');
+    if (!pill) return;
 
-  pills.forEach((pill) => {
-    pill.addEventListener('click', () => {
-      const filter = pill.dataset.filter;
-      pills.forEach((p) => {
-        p.classList.remove('active');
-        p.setAttribute('aria-selected', 'false');
-      });
-      pill.classList.add('active');
-      pill.setAttribute('aria-selected', 'true');
+    const pills = document.querySelectorAll<HTMLButtonElement>('.filter-pill');
+    const items = document.querySelectorAll<HTMLElement>('.gallery-item');
+    const empty = document.getElementById('galleryEmpty');
+    const filter = pill.dataset.filter;
 
-      let visible = 0;
-      items.forEach((item) => {
-        const match = filter === 'all' || item.dataset.category === filter;
-        item.classList.toggle('hidden', !match);
-        if (match) visible++;
-      });
-
-      if (empty) empty.hidden = visible > 0;
+    pills.forEach((p) => {
+      p.classList.remove('active');
+      p.setAttribute('aria-selected', 'false');
     });
+    pill.classList.add('active');
+    pill.setAttribute('aria-selected', 'true');
+
+    let visible = 0;
+    items.forEach((item) => {
+      const match = filter === 'all' || item.dataset.category === filter;
+      item.classList.toggle('hidden', !match);
+      // Odfiltrované fotky se po zobrazení už neschovávají za reveal animaci
+      if (match) {
+        item.classList.add('is-visible');
+        visible++;
+      }
+    });
+
+    if (empty) empty.hidden = visible > 0;
   });
+
+  // ----------------------------------------------------------------
+  // Kurzorová pilulka „Otevřít" nad fotkami — jen myš/trackpad
+  // ----------------------------------------------------------------
+  const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+
+  const ensurePill = () => {
+    if (!finePointer.matches) return;
+    if (!document.querySelector('.gallery-grid')) return;
+    if (document.querySelector('.cursor-pill')) return;
+    const pill = document.createElement('div');
+    pill.className = 'cursor-pill';
+    pill.textContent = 'Otevřít';
+    pill.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(pill);
+  };
+
+  document.addEventListener('mousemove', (e) => {
+    const pill = document.querySelector<HTMLElement>('.cursor-pill');
+    if (!pill) return;
+    pill.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
+    const overCard = (e.target as HTMLElement).closest?.('.photo-card');
+    pill.classList.toggle('active', !!overCard);
+  });
+
+  document.addEventListener('astro:page-load', ensurePill);
+  ensurePill();
 </script>

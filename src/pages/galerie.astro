@@ -2,6 +2,12 @@
 import BaseLayout from '~/layouts/BaseLayout.astro';
 import Gallery from '~/components/Gallery.astro';
 import Lightbox from '~/components/Lightbox.astro';
+import { categories } from '~/data/categories';
+import photosData from '~/data/photos.json';
+
+const activeCategoryCount = categories.filter((c) =>
+  photosData.some((p) => p.category === c.slug)
+).length;
 ---
 
 <BaseLayout title="Galerie" description="Kompletní fotografické portfolio rozdělené podle kategorií.">
@@ -9,6 +15,9 @@ import Lightbox from '~/components/Lightbox.astro';
     <div class="page-header-inner">
       <span class="eyebrow">Portfolio</span>
       <h1>Galerie</h1>
+      <p class="page-header-meta">
+        {photosData.length} fotografií · {activeCategoryCount} kategorií
+      </p>
       <p>
         Vyber kategorii nebo si projdi všechny fotografie. Po kliknutí na jakoukoli
         fotku se otevře větší náhled, mezi obrázky lze přecházet šipkami nebo
@@ -24,7 +33,7 @@ import Lightbox from '~/components/Lightbox.astro';
 
 <style>
   .page-header {
-    padding: 10rem var(--gutter) 4rem;
+    padding: 8rem var(--gutter) 3rem;
   }
 
   .page-header-inner {
@@ -33,11 +42,26 @@ import Lightbox from '~/components/Lightbox.astro';
   }
 
   .page-header h1 {
-    margin: 1rem 0 1.5rem;
-    font-size: clamp(3rem, 8vw, 6rem);
+    margin: 1rem 0 0.75rem;
+    font-size: clamp(3.25rem, 12vw, 6.5rem);
   }
 
-  .page-header p {
+  .page-header-meta {
+    margin-bottom: 1.25rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .page-header p:not(.page-header-meta) {
     max-width: 42ch;
+  }
+
+  @media (min-width: 721px) {
+    .page-header {
+      padding: 10rem var(--gutter) 4rem;
+    }
   }
 </style>

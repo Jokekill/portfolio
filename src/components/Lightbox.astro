@@ -39,6 +39,8 @@
 </div>
 
 <style>
+  /* Mobile-first: základ je mobil (šipky dole, caption pod fotkou),
+     min-width: 721px přepíná na desktopové rozložení */
   .lightbox {
     position: fixed;
     inset: 0;
@@ -60,38 +62,40 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 4rem var(--gutter) 2rem;
-    gap: 1.5rem;
+    justify-content: flex-start;
+    padding: 3.5rem 1rem 5.5rem;
+    gap: 1rem;
   }
 
   .lightbox-figure picture,
   .lightbox-figure img {
     max-width: min(100%, 1800px);
-    max-height: calc(100vh - 10rem);
-    max-height: calc(100svh - 10rem);
+    max-height: calc(100vh - 16rem);
+    max-height: calc(100svh - 16rem);
     object-fit: contain;
     display: block;
-    margin: 0 auto;
+    margin: auto auto 0;
     animation: fadeIn 0.4s ease-out;
   }
 
   .lightbox-caption {
     width: 100%;
     max-width: 1800px;
+    margin-bottom: auto;
+    padding: 0 0.25rem;
+    text-align: center;
   }
 
   .lightbox-caption-inner {
     display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 2rem;
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
   }
 
   .lightbox-caption h3 {
     font-family: var(--font-display);
-    font-size: 1.5rem;
+    font-size: 1.125rem;
     font-style: italic;
     font-weight: 400;
     color: var(--ink);
@@ -99,13 +103,13 @@
 
   .lightbox-caption p {
     color: var(--ink-soft);
-    font-size: 0.9375rem;
-    max-width: 50ch;
-    flex: 1;
+    font-size: 0.8125rem;
+    max-width: 40ch;
+    margin: 0 auto;
   }
 
   .lightbox-counter {
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
     color: var(--ink-mute);
     letter-spacing: 0.1em;
     font-variant-numeric: tabular-nums;
@@ -127,16 +131,16 @@
   }
 
   .lightbox-close:hover {
-    background: rgba(235, 230, 220, 0.08);
+    background: rgba(236, 231, 221, 0.08);
     color: var(--ink);
   }
 
   .lightbox-arrow {
     position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 56px;
-    height: 56px;
+    top: auto;
+    bottom: 1rem;
+    width: 48px;
+    height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -147,57 +151,65 @@
   }
 
   .lightbox-arrow:hover {
-    background: rgba(235, 230, 220, 0.08);
+    background: rgba(236, 231, 221, 0.08);
     color: var(--ink);
   }
 
-  .lightbox-prev { left: 1rem; }
-  .lightbox-next { right: 1rem; }
+  .lightbox-prev { left: 25%; transform: translateX(-50%); }
+  .lightbox-next { right: 25%; transform: translateX(50%); }
 
-  @media (max-width: 720px) {
+  @media (min-width: 721px) {
     .lightbox-figure {
-      padding: 3.5rem 1rem 5.5rem;
-      gap: 1rem;
-      justify-content: flex-start;
+      padding: 4rem var(--gutter) 2rem;
+      gap: 1.5rem;
+      justify-content: center;
     }
+
     .lightbox-figure picture,
     .lightbox-figure img {
-      max-height: calc(100svh - 16rem);
-      max-height: calc(100vh - 16rem);
-      margin-top: auto;
-    }
-    .lightbox-arrow {
-      top: auto;
-      bottom: 1rem;
-      transform: none;
-      width: 48px;
-      height: 48px;
-    }
-    .lightbox-prev { left: 25%; transform: translateX(-50%); }
-    .lightbox-next { right: 25%; transform: translateX(50%); }
-
-    /* Caption se zobrazí pod fotkou — mimo obraz, neruší */
-    .lightbox-caption {
-      margin-bottom: auto;
-      padding: 0 0.25rem;
-      text-align: center;
-    }
-    .lightbox-caption-inner {
-      flex-direction: column;
-      align-items: center;
-      gap: 0.4rem;
-    }
-    .lightbox-caption h3 {
-      font-size: 1.125rem;
-    }
-    .lightbox-caption p {
-      font-size: 0.8125rem;
-      max-width: 40ch;
+      max-height: calc(100vh - 10rem);
+      max-height: calc(100svh - 10rem);
       margin: 0 auto;
     }
-    .lightbox-counter {
-      font-size: 0.75rem;
+
+    .lightbox-caption {
+      margin-bottom: 0;
+      padding: 0;
+      text-align: left;
     }
+
+    .lightbox-caption-inner {
+      flex-direction: row;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .lightbox-caption h3 {
+      font-size: 1.5rem;
+    }
+
+    .lightbox-caption p {
+      font-size: 0.9375rem;
+      max-width: 50ch;
+      margin: 0;
+      flex: 1;
+    }
+
+    .lightbox-counter {
+      font-size: 0.8125rem;
+    }
+
+    .lightbox-arrow {
+      top: 50%;
+      bottom: auto;
+      width: 56px;
+      height: 56px;
+    }
+
+    .lightbox-prev { left: 1rem; transform: translateY(-50%); }
+    .lightbox-next { right: 1rem; transform: translateY(-50%); }
   }
 
   /* Telefon na šířku — schovej popisky, ať se fotka roztáhne přes celý displej */
@@ -210,8 +222,8 @@
     }
     .lightbox-figure picture,
     .lightbox-figure img {
-      max-height: calc(100svh - 1rem);
       max-height: calc(100vh - 1rem);
+      max-height: calc(100svh - 1rem);
       margin: 0 auto;
     }
     .lightbox-close {
@@ -223,12 +235,11 @@
     .lightbox-arrow {
       top: 50%;
       bottom: auto;
-      transform: translateY(-50%);
       width: 44px;
       height: 44px;
     }
-    .lightbox-prev { left: 0.25rem; }
-    .lightbox-next { right: 0.25rem; }
+    .lightbox-prev { left: 0.25rem; transform: translateY(-50%); }
+    .lightbox-next { right: 0.25rem; transform: translateY(-50%); }
   }
 </style>
 
@@ -241,12 +252,23 @@
 
   const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
-  // Načti data
-  const dataEl = document.getElementById('photoData');
-  const photos: Photo[] = dataEl ? JSON.parse(dataEl.textContent || '[]') : [];
+  // Všechny elementy se dotazují líně (až při použití) a listenery jsou
+  // delegované na document — modul se načte jednou a funguje i po
+  // view-transition navigacích, kdy se DOM kompletně vymění.
+  let currentList: Photo[] = [];
+  let currentIndex = 0;
+  let lastFocused: HTMLElement | null = null;
 
-  // Vytvoř lookup index → pořadí v `photos` (pro filtrovaný stav)
+  const getLightbox = () => document.getElementById('lightbox');
+
+  const getPhotos = (): Photo[] => {
+    const dataEl = document.getElementById('photoData');
+    return dataEl ? JSON.parse(dataEl.textContent || '[]') : [];
+  };
+
+  // Fotky viditelné v aktuálním filtru (pořadí dle DOM)
   const getVisiblePhotos = (): Photo[] => {
+    const photos = getPhotos();
     const visible: Photo[] = [];
     document.querySelectorAll<HTMLElement>('.gallery-item').forEach((item) => {
       if (!item.classList.contains('hidden')) {
@@ -259,111 +281,121 @@
     return visible;
   };
 
-  const lightbox = document.getElementById('lightbox') as HTMLElement | null;
-  const picture = document.getElementById('lightboxPicture') as HTMLElement | null;
-  const img = document.getElementById('lightboxImage') as HTMLImageElement | null;
-  const titleEl = document.getElementById('lightboxTitle');
-  const descEl = document.getElementById('lightboxDescription');
-  const counterEl = document.getElementById('lightboxCounter');
+  const renderPhoto = (photo: Photo) => {
+    const picture = document.getElementById('lightboxPicture');
+    const img = document.getElementById('lightboxImage') as HTMLImageElement | null;
+    if (!picture || !img) return;
 
-  if (!lightbox || !picture || !img) {
-    // Komponenta není na stránce
-  } else {
-    let currentList: Photo[] = [];
-    let currentIndex = 0;
-    let lastFocused: HTMLElement | null = null;
+    // Vyčisti staré <source> a vlož WebP source
+    picture.querySelectorAll('source').forEach((s) => s.remove());
+    const webpSource = document.createElement('source');
+    webpSource.type = 'image/webp';
+    webpSource.srcset = `${base}/images/generated/${photo.src}-1600.webp 1600w, ${base}/images/generated/${photo.src}-2400.webp 2400w`;
+    webpSource.setAttribute('sizes', '95vw');
+    picture.insertBefore(webpSource, img);
 
-    const renderPhoto = (photo: Photo) => {
-      // Vyčisti staré <source> a vlož WebP source
-      picture.querySelectorAll('source').forEach((s) => s.remove());
-      const webpSource = document.createElement('source');
-      webpSource.type = 'image/webp';
-      webpSource.srcset = `${base}/images/generated/${photo.src}-1600.webp 1600w, ${base}/images/generated/${photo.src}-2400.webp 2400w`;
-      webpSource.setAttribute('sizes', '95vw');
-      picture.insertBefore(webpSource, img);
+    img.src = `${base}/images/generated/${photo.src}-1600.jpg`;
+    img.srcset = `${base}/images/generated/${photo.src}-1600.jpg 1600w, ${base}/images/generated/${photo.src}-2400.jpg 2400w`;
+    img.sizes = '95vw';
+    img.alt = photo.alt;
+    img.width = photo.width;
+    img.height = photo.height;
 
-      img.src = `${base}/images/generated/${photo.src}-1600.jpg`;
-      img.srcset = `${base}/images/generated/${photo.src}-1600.jpg 1600w, ${base}/images/generated/${photo.src}-2400.jpg 2400w`;
-      img.sizes = '95vw';
-      img.alt = photo.alt;
-      img.width = photo.width;
-      img.height = photo.height;
+    const titleEl = document.getElementById('lightboxTitle');
+    const descEl = document.getElementById('lightboxDescription');
+    const counterEl = document.getElementById('lightboxCounter');
+    if (titleEl) titleEl.textContent = photo.title;
+    if (descEl) descEl.textContent = photo.description || '';
+    if (counterEl) counterEl.textContent = `${currentIndex + 1} / ${currentList.length}`;
+  };
 
-      if (titleEl) titleEl.textContent = photo.title;
-      if (descEl) descEl.textContent = photo.description || '';
-      if (counterEl) counterEl.textContent = `${currentIndex + 1} / ${currentList.length}`;
-    };
-
-    const open = (photoId: string) => {
-      currentList = getVisiblePhotos();
-      currentIndex = currentList.findIndex((p) => p.id === photoId);
-      if (currentIndex < 0) return;
-      lastFocused = document.activeElement as HTMLElement;
-      lightbox.hidden = false;
-      document.body.style.overflow = 'hidden';
-      renderPhoto(currentList[currentIndex]);
-      // Preload soused
-      [-1, 1].forEach((d) => {
-        const n = currentList[(currentIndex + d + currentList.length) % currentList.length];
-        if (n) new Image().src = `${base}/images/generated/${n.src}-1600.jpg`;
-      });
-    };
-
-    const close = () => {
-      lightbox.hidden = true;
-      document.body.style.overflow = '';
-      lastFocused?.focus();
-    };
-
-    const next = () => {
-      currentIndex = (currentIndex + 1) % currentList.length;
-      renderPhoto(currentList[currentIndex]);
-    };
-
-    const prev = () => {
-      currentIndex = (currentIndex - 1 + currentList.length) % currentList.length;
-      renderPhoto(currentList[currentIndex]);
-    };
-
-    // Klikání na fotky
-    document.querySelectorAll<HTMLAnchorElement>('.photo-card').forEach((card) => {
-      card.addEventListener('click', (e) => {
-        e.preventDefault();
-        const id = card.dataset.photoId;
-        if (id) open(id);
-      });
+  const open = (photoId: string) => {
+    const lightbox = getLightbox();
+    if (!lightbox) return;
+    currentList = getVisiblePhotos();
+    currentIndex = currentList.findIndex((p) => p.id === photoId);
+    if (currentIndex < 0) return;
+    lastFocused = document.activeElement as HTMLElement;
+    lightbox.hidden = false;
+    document.body.style.overflow = 'hidden';
+    renderPhoto(currentList[currentIndex]);
+    // Preload sousedů
+    [-1, 1].forEach((d) => {
+      const n = currentList[(currentIndex + d + currentList.length) % currentList.length];
+      if (n) new Image().src = `${base}/images/generated/${n.src}-1600.jpg`;
     });
+  };
 
-    // Tlačítka v lightboxu
-    document.getElementById('lightboxClose')?.addEventListener('click', close);
-    document.getElementById('lightboxPrev')?.addEventListener('click', prev);
-    document.getElementById('lightboxNext')?.addEventListener('click', next);
+  const close = () => {
+    const lightbox = getLightbox();
+    if (!lightbox) return;
+    lightbox.hidden = true;
+    document.body.style.overflow = '';
+    lastFocused?.focus();
+  };
+
+  const next = () => {
+    if (!currentList.length) return;
+    currentIndex = (currentIndex + 1) % currentList.length;
+    renderPhoto(currentList[currentIndex]);
+  };
+
+  const prev = () => {
+    if (!currentList.length) return;
+    currentIndex = (currentIndex - 1 + currentList.length) % currentList.length;
+    renderPhoto(currentList[currentIndex]);
+  };
+
+  // Klikání — delegovaně
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+
+    const card = target.closest<HTMLElement>('.photo-card');
+    if (card) {
+      e.preventDefault();
+      const id = card.dataset.photoId;
+      if (id) open(id);
+      return;
+    }
+
+    if (target.closest('#lightboxClose')) { close(); return; }
+    if (target.closest('#lightboxPrev')) { prev(); return; }
+    if (target.closest('#lightboxNext')) { next(); return; }
 
     // Klik na pozadí zavře (ne na fotku samotnou)
-    lightbox.addEventListener('click', (e) => {
-      if (e.target === lightbox) close();
-    });
+    const lightbox = getLightbox();
+    if (lightbox && !lightbox.hidden && e.target === lightbox) close();
+  });
 
-    // Klávesnice
-    document.addEventListener('keydown', (e) => {
-      if (lightbox.hidden) return;
-      if (e.key === 'Escape') close();
-      else if (e.key === 'ArrowRight') next();
-      else if (e.key === 'ArrowLeft') prev();
-    });
+  // Klávesnice
+  document.addEventListener('keydown', (e) => {
+    const lightbox = getLightbox();
+    if (!lightbox || lightbox.hidden) return;
+    if (e.key === 'Escape') close();
+    else if (e.key === 'ArrowRight') next();
+    else if (e.key === 'ArrowLeft') prev();
+  });
 
-    // Swipe na mobilu
-    let touchStartX = 0;
-    lightbox.addEventListener('touchstart', (e) => {
-      touchStartX = e.touches[0].clientX;
-    }, { passive: true });
+  // Swipe na mobilu
+  let touchStartX = 0;
+  document.addEventListener('touchstart', (e) => {
+    const lightbox = getLightbox();
+    if (!lightbox || lightbox.hidden) return;
+    touchStartX = e.touches[0].clientX;
+  }, { passive: true });
 
-    lightbox.addEventListener('touchend', (e) => {
-      const dx = e.changedTouches[0].clientX - touchStartX;
-      if (Math.abs(dx) > 60) {
-        if (dx < 0) next();
-        else prev();
-      }
-    }, { passive: true });
-  }
+  document.addEventListener('touchend', (e) => {
+    const lightbox = getLightbox();
+    if (!lightbox || lightbox.hidden) return;
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 60) {
+      if (dx < 0) next();
+      else prev();
+    }
+  }, { passive: true });
+
+  // Po navigaci zajisti odemčený scroll (kdyby lightbox zůstal otevřený)
+  document.addEventListener('astro:after-swap', () => {
+    document.body.style.overflow = '';
+  });
 </script>

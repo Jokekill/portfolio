@@ -1,4 +1,6 @@
 ---
+import { categoryBySlug } from '~/data/categories';
+
 interface Props {
   photo: {
     id: string;
@@ -16,6 +18,8 @@ interface Props {
 const { photo, index } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const gen = `${base}/images/generated`;
+const categoryLabel = categoryBySlug(photo.category)?.label ?? photo.category;
+const number = String(index + 1).padStart(2, '0');
 ---
 
 <a
@@ -46,8 +50,8 @@ const gen = `${base}/images/generated`;
   </picture>
 
   <div class="photo-card-meta">
+    <span class="photo-card-tag">{categoryLabel} · {number}</span>
     <h3>{photo.title}</h3>
-    {photo.description && <span>{photo.description}</span>}
   </div>
 </a>
 
@@ -66,64 +70,72 @@ const gen = `${base}/images/generated`;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 1.4s var(--ease), filter var(--transition);
-    filter: brightness(0.92) saturate(0.95);
   }
 
-  .photo-card:hover img {
-    transform: scale(1.04);
-    filter: brightness(1) saturate(1);
-  }
-
-  .photo-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to top, rgba(13, 12, 10, 0.85) 0%, transparent 50%);
-    opacity: 0;
-    transition: opacity var(--transition);
-    z-index: 1;
-  }
-
-  .photo-card:hover::before {
-    opacity: 1;
-  }
-
+  /* Meta overlay a hover efekty jen na zařízeních s myší.
+     Na dotyku se název zobrazí až v lightboxu. */
   .photo-card-meta {
-    position: absolute;
-    left: 1.25rem;
-    right: 1.25rem;
-    bottom: 1.25rem;
-    z-index: 2;
-    transform: translateY(8px);
-    opacity: 0;
-    transition: all var(--transition);
+    display: none;
   }
 
-  .photo-card:hover .photo-card-meta {
-    transform: translateY(0);
-    opacity: 1;
-  }
+  @media (hover: hover) and (pointer: fine) {
+    .photo-card img {
+      transition: transform 1.4s var(--ease), filter var(--transition);
+      filter: brightness(0.92) saturate(0.95);
+    }
 
-  .photo-card-meta h3 {
-    font-family: var(--font-display);
-    font-size: 1.25rem;
-    font-weight: 400;
-    font-style: italic;
-    color: var(--ink);
-    margin-bottom: 0.25rem;
-  }
+    .photo-card:hover img {
+      transform: scale(1.04);
+      filter: brightness(1) saturate(1);
+    }
 
-  .photo-card-meta span {
-    font-size: 0.8125rem;
-    color: var(--ink-soft);
-    display: block;
-  }
+    .photo-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(10, 9, 8, 0.85) 0%, transparent 50%);
+      opacity: 0;
+      transition: opacity var(--transition);
+      z-index: 1;
+    }
 
-  /* Na dotykových zařízeních / mobilu — meta i gradient skryté.
-     Název a popis se objeví až v lightboxu po rozkliknutí. */
-  @media (hover: none), (max-width: 720px) {
-    .photo-card::before { opacity: 0; }
-    .photo-card-meta { display: none; }
+    .photo-card:hover::before {
+      opacity: 1;
+    }
+
+    .photo-card-meta {
+      display: block;
+      position: absolute;
+      left: 1.25rem;
+      right: 1.25rem;
+      bottom: 1.25rem;
+      z-index: 2;
+      transform: translateY(8px);
+      opacity: 0;
+      transition: all var(--transition);
+    }
+
+    .photo-card:hover .photo-card-meta {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .photo-card-tag {
+      display: block;
+      margin-bottom: 0.4rem;
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .photo-card-meta h3 {
+      font-family: var(--font-display);
+      font-size: 1.375rem;
+      font-weight: 400;
+      font-style: italic;
+      color: var(--ink);
+    }
   }
 </style>

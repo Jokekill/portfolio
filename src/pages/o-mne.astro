@@ -10,7 +10,7 @@ const portrait = photosData.find((p) => p.category === 'portrety') || photosData
 <BaseLayout title="O mně" description={`O fotografovi ${site.authorName}.`}>
   <section class="about">
     <div class="about-grid">
-      <div class="about-image">
+      <div class="about-image" data-reveal>
         <picture>
           <source
             type="image/webp"
@@ -29,25 +29,25 @@ const portrait = photosData.find((p) => p.category === 'portrety') || photosData
 
       <div class="about-text">
         <span class="eyebrow">{site.location}</span>
-        <h1>Ahoj, jsem {site.authorName.split(' ')[0]}.</h1>
+        <h1>Ahoj, jsem <em>{site.authorName.split(' ')[0]}</em>.</h1>
 
-        <p>
+        <p data-reveal>
           Fotím (s přestávkami) od dětství. Začínal jsem, když mi rodiče dali do ruky foťák na film.
           Následně mě nadchli pro focení prarodiče, kteří pořádali fotosouteže pro svá vnoučata.
 
           Nyní fotím již hlavně pro sebe, tedy pro Radost. A to díky mé úžasné ženě, která mi darovala k Váncům můj současný foťák.
         </p>
 
-        <p>
+        <p data-reveal>
           Na fotografování je nejlepší to, že mě nutí dívat se na svět očima fotografa. Tedy hledat fascinující kompozice na místech, kterými někdo jiný jen projde. Všímat si detailů, které by jinak zůstaly opomenuty, a zachycovat emotivní momenty, kterým by hrozilo zapomenutí.
 Fotografování mě zkrátka nutí více si užívat krásu naší Země. A za to jsem neskutečně rád.
         </p>
 
-        <p>
+        <p data-reveal>
           Pokud byste chtěli, abych zachytil i vaše důležité momenty - ozvěte se. Rád budu nápomocen.
         </p>
 
-        <div class="about-links">
+        <div class="about-links" data-reveal>
           <a href={`mailto:${site.email}`} class="btn btn-primary">{site.email}</a>
           <a href={site.instagramUrl} class="btn btn-ghost" target="_blank" rel="noopener noreferrer">
             @{site.instagram}
@@ -60,21 +60,19 @@ Fotografování mě zkrátka nutí více si užívat krásu naší Země. A za t
 
 <style>
   .about {
-    padding: 10rem var(--gutter) 6rem;
+    padding: 8rem var(--gutter) 4rem;
   }
 
   .about-grid {
     max-width: var(--container);
     margin: 0 auto;
     display: grid;
-    grid-template-columns: 5fr 6fr;
-    gap: 5rem;
+    grid-template-columns: 1fr;
+    gap: 3rem;
     align-items: start;
   }
 
   .about-image {
-    position: sticky;
-    top: 6rem;
     aspect-ratio: 4 / 5;
     overflow: hidden;
     background: var(--bg-elevated);
@@ -88,12 +86,8 @@ Fotografování mě zkrátka nutí více si užívat krásu naší Země. A za t
   }
 
   .about-text h1 {
-    margin: 1rem 0 2.5rem;
-  }
-
-  .about-text h1 em {
-    font-style: italic;
-    color: var(--ink-soft);
+    margin: 1rem 0 2rem;
+    font-size: clamp(2.5rem, 9vw, 5.5rem);
   }
 
   .about-text p {
@@ -106,12 +100,31 @@ Fotografování mě zkrátka nutí více si užívat krásu naší Země. A za t
   .about-links {
     display: flex;
     gap: 1rem;
-    margin-top: 3rem;
+    margin-top: 2.5rem;
     flex-wrap: wrap;
   }
 
-  @media (max-width: 800px) {
-    .about-grid { grid-template-columns: 1fr; gap: 3rem; }
-    .about-image { position: static; aspect-ratio: 4 / 5; }
+  @media (min-width: 801px) {
+    .about {
+      padding: 10rem var(--gutter) 6rem;
+    }
+
+    .about-grid {
+      grid-template-columns: 5fr 6fr;
+      gap: 5rem;
+    }
+
+    .about-image {
+      position: sticky;
+      top: 6rem;
+    }
+
+    .about-text h1 {
+      margin-bottom: 2.5rem;
+    }
+
+    .about-links {
+      margin-top: 3rem;
+    }
   }
 </style>
