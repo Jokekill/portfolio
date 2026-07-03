@@ -22,8 +22,10 @@ const categoryLabel = categoryBySlug(photo.category)?.label ?? photo.category;
 const number = String(index + 1).padStart(2, '0');
 ---
 
-<a
-  href="#"
+<!-- Button, ne <a href="#"> — anchor by zachytil view-transitions router
+     a místo lightboxu provedl navigaci -->
+<button
+  type="button"
   class="photo-card"
   data-photo-id={photo.id}
   data-photo-category={photo.category}
@@ -53,17 +55,19 @@ const number = String(index + 1).padStart(2, '0');
     <span class="photo-card-tag">{categoryLabel} · {number}</span>
     <h3>{photo.title}</h3>
   </div>
-</a>
+</button>
 
 <style>
   .photo-card {
     position: relative;
     display: block;
+    width: 100%;
     overflow: hidden;
     background: var(--bg-elevated);
     aspect-ratio: var(--aspect);
     cursor: pointer;
     isolation: isolate;
+    text-align: left;
   }
 
   .photo-card img {
