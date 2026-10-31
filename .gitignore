@@ -25,3 +25,6 @@ photos/originals/*
 # Lokální tajemství
 .env
 .env.local
+
+# Fotky čekající na přidání (originály, necommitují se)
+photos/To Be Added/
